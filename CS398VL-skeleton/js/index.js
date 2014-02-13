@@ -1,8 +1,4 @@
 function main(name){
-  var parseDate = d3.time.format("%Y-%m").parse,
-      formatYear = d3.format("02d"),
-      formatDate = function(d) { return "Q" + ((d.getMonth() / 3 | 0) + 1) + formatYear(d.getFullYear() % 100); };
-
   var getX = function(d) {return d;};
 
   var margin = {top: 75, right: 20, bottom: 20, left: 60},
@@ -27,7 +23,7 @@ function main(name){
 
   var stack = d3.layout.stack()
       .values(function(d) { return d.values; })
-      .x(function(d) { return d.date; })
+      .x(function(d) { return d.word; })
       .y(function(d) { return d.value; })
       .out(function(d, y0) { d.valueOffset = y0; });
 
@@ -42,14 +38,14 @@ function main(name){
   d3.tsv(name, function(error, data) {
 
     data.forEach(function(d) {
-      d.date = d.date;
+      d.word = d.word;
       d.value = +d.value;
     });
 
     var dataByGroup = nest.entries(data);
 
     stack(dataByGroup);
-    x.domain(dataByGroup[0].values.map(function(d) { return d.date; }));
+    x.domain(dataByGroup[0].values.map(function(d) { return d.word; }));
     y0.domain(dataByGroup.map(function(d) { return d.key; }));
     y1.domain([0, d3.max(data, function(d) { return d.value; })]).range([y0.rangeBand(), 0]);
 
@@ -70,7 +66,7 @@ function main(name){
         .data(function(d) { return d.values; })
       .enter().append("rect")
         .style("fill", function(d) { return color(d.group); })
-        .attr("x", function(d) { return x(d.date); })
+        .attr("x", function(d) { return x(d.word); })
         .attr("y", function(d) { return y1(d.value); })
         .attr("width", x.rangeBand())
         .attr("height", function(d) { return y0.rangeBand() - y1(d.value); });
